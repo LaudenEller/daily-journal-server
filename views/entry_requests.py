@@ -19,8 +19,7 @@ def get_all_entries():
                 e.entry,
                 e.moodId,
                 e.date,
-                m.label,
-                t.name tag_name
+                m.label
             FROM journal_entries e
             JOIN Moods m
             ON m.id = e.moodId
@@ -30,29 +29,11 @@ def get_all_entries():
 
         dataset = db_cursor.fetchall()                # db_cursor has value of Sql query from .execute(), converts results to data form set by line 12
                                                             # .fetchall() sets dataset to iterable python datatype
-        # db_cursor.execute("""
-        #                 SELECT
-        #                     t.name
-        #                 FROM Tag t
-        #                 JOIN Entrytag et
-        #                 ON et.tag_id = t.id
-        #                 """)
-        
-        # entry_tags = db_cursor.fetchall()
 
         for row in dataset:
             
             tags = []
-            # Use method that checks the entries list for the entry ids, if there is an entry dictionary with that entry id, get the new tag and push it to the existing dictionary
-                # If there isn't an entry dictionary with that entry id, create a new entry and push it to the list
-            # if row['id'] in entries:
-            #     tag = Tag(row['t.id'], row['tag_name'])
-            #     tags.append(tag)
-            # else:
-                
             
-            #Conditional statement that checks entry ids and if so, gets tag and pushes into existing list of tags. If not, creates new entries for new ids, but pushes tags to existing 
-             
             entry = Journal_entries(row['id'], row['concept'], row['entry'], row['moodId'],
                         row['date'], )
         
@@ -69,13 +50,15 @@ def get_all_entries():
                             ON et.tag_id = t.id
                             WHERE et.entry_id = ?
                             """, ( entry.id, ))
+            
             entry_tags = db_cursor.fetchall()
 
             for et in entry_tags:
                 tag = Tag(et['id'], et['tag_name'])
+                tag = tag.__dict__
                 tags.append(tag)
         
-            entry.tags = tags.__dict__
+            entry.tags = tags
 
             entry.mood = mood.__dict__
 
